@@ -188,6 +188,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test:rules:1.0.1'
     androidTestImplementation "com.android.support.test.espresso:espresso-intents:${espresseVersion}"
     androidTestImplementation "com.android.support.test.espresso:espresso-core:${espresseVersion}"
+    androidTestImplementation "com.android.support.test.espresso:espresso-contrib:$espresseVersion"
     // TODO(1) в dimention androidTest добавить зависимость автоматора в зависимости от использования androidx
     androidTestImplementation"com.android.support.test.uiautomator:uiautomator-v18:2.1.3"
 }
