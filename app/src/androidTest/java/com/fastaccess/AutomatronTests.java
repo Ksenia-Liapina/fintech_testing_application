@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.support.test.InstrumentationRegistry;
-import android.support.test.espresso.core.deps.guava.collect.Iterables;
 import android.support.test.runner.AndroidJUnit4;
 import android.support.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
 import android.support.test.runner.lifecycle.Stage;
@@ -135,8 +134,6 @@ public class AutomatronTests {
         UiObject purchaseRestoreMenuItem = mDevice.findObject(new UiSelector()
                 .text("Restore Purchases"));
         purchaseRestoreMenuItem.click();
-
-        Activity activity = getCurrentActivity();
         /*assertEquals("CheckPurchaseActivity", activity.getClass().getSimpleName());*/
     }
 
@@ -213,18 +210,6 @@ public class AutomatronTests {
                 .descriptionContains("Navigate up")
         );
         mainNavMenu.click();
-    }
-
-    private Activity getCurrentActivity() throws Throwable {
-        getInstrumentation().waitForIdleSync();
-        final Activity[] activity = new Activity[1];
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                java.util.Collection<Activity> activities = ActivityLifecycleMonitorRegistry.getInstance().getActivitiesInStage(Stage.RESUMED);
-                activity[0] = Iterables.getOnlyElement(activities);
-            }});
-        return activity[0];
     }
 
     public boolean isDarkThemeSelected() {
