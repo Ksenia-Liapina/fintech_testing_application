@@ -1,0 +1,142 @@
+package com.fastaccess.espresso;
+
+import android.support.design.widget.TextInputLayout;
+import android.support.test.espresso.Espresso;
+import android.support.test.espresso.action.ViewActions;
+import android.support.test.espresso.intent.rule.IntentsTestRule;
+import android.support.test.espresso.matcher.ViewMatchers;
+import android.support.test.rule.ActivityTestRule;
+import android.support.test.runner.AndroidJUnit4;
+
+import com.fastaccess.R;
+import com.fastaccess.helper.PrefHelper;
+import com.fastaccess.ui.modules.main.MainActivity;
+import com.fastaccess.ui.modules.main.donation.CheckPurchaseActivity;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import androidx.test.uiautomator.UiDevice;
+
+import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.Espresso.pressBack;
+import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.intent.Intents.intended;
+import static android.support.test.espresso.intent.matcher.IntentMatchers.hasComponent;
+import static android.support.test.espresso.matcher.RootMatchers.withDecorView;
+import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.withChild;
+import static android.support.test.espresso.matcher.ViewMatchers.withContentDescription;
+import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static android.support.test.espresso.matcher.ViewMatchers.withParent;
+import static android.support.test.espresso.matcher.ViewMatchers.withParentIndex;
+import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.core.AllOf.allOf;
+import static org.junit.Assert.assertEquals;
+
+
+@RunWith(AndroidJUnit4.class)
+public class EspressoTests {
+
+    @Rule
+    public ActivityTestRule<MainActivity> activityRule
+            = new ActivityTestRule<>(
+            MainActivity.class,
+            true,
+            true);
+
+
+    @Test
+    public void testTrending(){
+        onView(allOf(withParent(withId(R.id.toolbar)), instanceOf(android.widget.ImageButton.class)))
+                .perform(ViewActions.click());
+        onView((withText(R.string.trending))).perform(ViewActions.click());
+        onView(allOf(withParent(withId(R.id.toolbar)), instanceOf(android.widget.TextView.class)))
+                .check(matches(withText(containsString("Trending"))));
+    }
+
+    @Test
+    public void testThemeChange(){
+        onView(allOf(withParent(withId(R.id.toolbar)), instanceOf(android.widget.ImageButton.class)))
+                .perform(ViewActions.click());
+
+        onView((withText(R.string.settings))).perform(ViewActions.click());
+
+        onView((withText(R.string.theme_title))).perform(ViewActions.click());
+
+        onView((instanceOf(android.support.v4.view.ViewPager.class))).perform(ViewActions.swipeLeft());
+
+        onView((allOf(withParent(allOf(withParentIndex(1),withId(R.id.coordinatorLayout))), withId(R.id.apply)))).perform(ViewActions.click());
+
+        assertEquals("Dark Theme", PrefHelper.getString("appTheme"));
+    }
+
+    @Rule
+    public IntentsTestRule<CheckPurchaseActivity> intentsTestRule =
+            new IntentsTestRule<>(CheckPurchaseActivity.class);
+
+    @Test
+    public void testRestorePurchase(){
+        onView(allOf(withParent(withId(R.id.toolbar)), instanceOf(android.widget.ImageButton.class)))
+                .perform(ViewActions.click());
+
+        onView((withText(R.string.settings)))
+                .perform(ViewActions.swipeUp())
+                .perform(ViewActions.swipeUp())
+                .perform(ViewActions.swipeUp());
+        onView((withText(R.string.restore_purchases))).perform(ViewActions.click());
+
+        intended(hasComponent(CheckPurchaseActivity.class.getName()));
+    }
+
+    @Test
+    public void testSendFeedback(){
+        onView(allOf(withParent(withId(R.id.toolbar)), instanceOf(android.widget.ImageButton.class)))
+                .perform(ViewActions.click());
+
+        onView((withText(R.string.send_feedback))).perform(ViewActions.click());
+
+        //For close debug message popup
+        pressBack();
+
+        onView(instanceOf(android.widget.EditText.class))
+                .perform(ViewActions.click())
+                .perform(ViewActions.typeText("Hello"));
+
+        onView((withId(R.id.description))).perform(ViewActions.click());
+
+        onView((withId(R.id.submit))).perform(ViewActions.click());
+
+        onView((withId(R.id.submit))).perform(ViewActions.click());
+
+        onView(withText("Message was sent"))
+                .inRoot(withDecorView(not(activityRule.getActivity().getWindow().getDecorView())))
+                .check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void testChangeLogText(){
+        onView(allOf(withParent(withId(R.id.toolbar)), instanceOf(android.widget.ImageButton.class)))
+                .perform(ViewActions.click());
+
+        onView((withText(R.string.send_feedback)))
+                .perform(ViewActions.swipeUp())
+                .perform(ViewActions.swipeUp())
+                .perform(ViewActions.swipeUp())
+                .perform(ViewActions.swipeUp());
+
+        onView((withText(R.string.about)))
+                .perform(ViewActions.click());
+
+        onView(allOf(
+                withParent(withParent(withParent(withChild(withText("About"))))),
+                withParent(withParentIndex(1)),
+                withChild(withText("Changelog")))
+        ).perform(ViewActions.click());
+    }
+    
+}
